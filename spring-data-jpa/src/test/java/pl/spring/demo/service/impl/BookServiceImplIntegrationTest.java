@@ -1,5 +1,6 @@
 package pl.spring.demo.service.impl;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -199,6 +200,7 @@ public class BookServiceImplIntegrationTest extends AbstractDatabaseTest {
     }
 
     @Test
+    @Ignore("Annotate AudioBookExemplarEntity with JPA annotations first!")
     public void testShouldCreateNewBookWithExemplars() {
         // given
         NewBookTo bookToSave = new NewBookTo();
