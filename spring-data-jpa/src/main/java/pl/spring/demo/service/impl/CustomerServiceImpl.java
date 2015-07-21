@@ -41,8 +41,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void deleteCustomer(long customerId) {
-        CustomerEntity customerEntity = customerDao.find(customerId);
-        customerEntity.getLoans().forEach(loan -> loan.getBookExemplars().forEach(bookExemplar -> bookExemplar.setLoan(null)));
-        customerDao.delete(customerEntity);
+        // TODO Implement
     }
 }

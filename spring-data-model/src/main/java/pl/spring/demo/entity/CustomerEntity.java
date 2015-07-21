@@ -24,11 +24,10 @@ public class CustomerEntity {
     @Column(length = 35, nullable = false)
     private String email;
 
-    @OneToMany(mappedBy = "customerEntity", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "customerEntity")
     private Set<LoanEntity> loans = new HashSet<>();
 
-    // strange behavior, orphanRemoval must be used together with cascade, otherwise it does not work
-    @OneToMany(mappedBy = "customerEntity", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "customerEntity")
     private Set<CustomerCardEntity> cards = new HashSet<>();
 
     // for hibernate
