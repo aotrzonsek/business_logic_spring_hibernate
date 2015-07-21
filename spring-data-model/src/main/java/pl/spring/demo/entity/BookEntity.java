@@ -16,7 +16,7 @@ public class BookEntity implements Serializable {
     @Column(nullable = false, length = 50)
     private String title;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "book")
     private Set<BookExemplarEntity> bookExemplars = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)

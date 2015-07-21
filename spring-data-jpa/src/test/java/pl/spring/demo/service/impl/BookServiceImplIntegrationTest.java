@@ -200,8 +200,25 @@ public class BookServiceImplIntegrationTest extends AbstractDatabaseTest {
     }
 
     @Test
+    @Ignore("Fix problem in BookEntity")
+    public void testShouldCreateNewBookWithPaperExemplars() {
+        // given
+        NewBookTo bookToSave = new NewBookTo();
+        bookToSave.setTitle("Title of new book");
+
+        PaperBookExemplarTo paperBookExemplar1 = new PaperBookExemplarTo("123", 333, PaperSize.A_4, BookCover.HARD);
+        PaperBookExemplarTo paperBookExemplar2 = new PaperBookExemplarTo("234", 222, PaperSize.B_5, BookCover.SOFT);
+        bookToSave.setExemplars(new HashSet<>(Arrays.asList(paperBookExemplar1, paperBookExemplar2)));
+        // when
+        BookTo alreadySavedBook = bookService.createBook(bookToSave);
+        // then
+        assertNotNull(alreadySavedBook.getId());
+        assertEquals(2, bookService.findBookExemplars(alreadySavedBook.getId()).size());
+    }
+
+    @Test
     @Ignore("Annotate AudioBookExemplarEntity with JPA annotations first!")
-    public void testShouldCreateNewBookWithExemplars() {
+    public void testShouldCreateNewBookWithPaperAndAudioBookExemplars() {
         // given
         NewBookTo bookToSave = new NewBookTo();
         bookToSave.setTitle("Title of new book");
