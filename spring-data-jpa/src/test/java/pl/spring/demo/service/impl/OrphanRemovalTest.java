@@ -9,10 +9,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionTemplate;
 import pl.spring.demo.dao.CustomerCardDao;
 import pl.spring.demo.dao.CustomerDao;
-import pl.spring.demo.entity.CustomerCardEntity;
 import pl.spring.demo.entity.CustomerEntity;
-
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,11 +39,7 @@ public class OrphanRemovalTest extends AbstractDatabaseTest {
             return null;
         });
 
-        transactionTemplate.execute((TransactionStatus transactionStatus) -> {
-            List<CustomerCardEntity> cards = customerCardDao.findAll();
-            assertEquals(0, cards.size());
-            return null;
-        });
+        assertEquals(1, customerCardDao.count()); // the only card without assigned customer
     }
 
 }

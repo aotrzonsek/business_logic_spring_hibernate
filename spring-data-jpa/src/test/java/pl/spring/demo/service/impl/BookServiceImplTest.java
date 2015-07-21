@@ -1,82 +1,248 @@
 package pl.spring.demo.service.impl;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import pl.spring.demo.dao.BookDao;
-import pl.spring.demo.dao.BookExemplarDao;
-import pl.spring.demo.dao.CustomerDao;
-import pl.spring.demo.dao.LoanDao;
-import pl.spring.demo.entity.BookEntity;
-import pl.spring.demo.entity.LoanEntity;
-import pl.spring.demo.entity.PaperBookExemplarEntity;
-import pl.spring.demo.mapper.BookMapper;
-import pl.spring.demo.service.helper.CurrentDateProvider;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import pl.spring.demo.service.BookService;
 import pl.spring.demo.to.*;
+import pl.spring.demo.type.AudioBookFormat;
 import pl.spring.demo.type.BookCover;
 import pl.spring.demo.type.PaperSize;
 
-import java.util.ArrayList;
+import javax.persistence.OptimisticLockException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
 
-public class BookServiceImplTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration
+public class BookServiceImplTest extends AbstractDatabaseTest {
 
-    @InjectMocks
-    private BookServiceImpl bookService;
+    @Autowired
+    private BookService bookService;
 
-    @Mock
-    private BookMapper bookMapper;
-
-    @Mock
-    private CurrentDateProvider currentDateProvider;
-
-    @Mock
-    private BookDao bookDao;
-
-    @Mock
-    private BookExemplarDao bookExemplarDao;
-
-    @Mock
-    private CustomerDao customerDao;
-
-    @Mock
-    private LoanDao loanDao;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+    @Test
+    public void findBooksShouldFindBooksByTitle() {
+        // given
+        String title = "Wszyscy mamy";
+        BookSearchCriteriaTo searchCriteria = new BookSearchCriteriaTo();
+        searchCriteria.setTitle(title);
+        // when
+        List<BookTo> books = bookService.findBooks(searchCriteria);
+        // then
+        assertEquals(1, books.size());
     }
 
     @Test
-    public void findBooksShouldWork() {
+    public void findBooksShouldNotFindBooksByNotExistingTitle() {
         // given
-        List<BookEntity> bookEntities = new ArrayList<>();
-        when(bookDao.findBooks(any(BookSearchCriteriaTo.class))).thenReturn(bookEntities);
-        List<BookTo> bookTos = new ArrayList<>();
-        when(bookMapper.mapSourceCollection(bookEntities)).thenReturn(bookTos);
+        String title = "NotExistingTitle123";
+        BookSearchCriteriaTo searchCriteria = new BookSearchCriteriaTo();
+        searchCriteria.setTitle(title);
         // when
-        List<BookTo> results = bookService.findBooks(new BookSearchCriteriaTo());
+        List<BookTo> books = bookService.findBooks(searchCriteria);
         // then
-        assertEquals(bookTos, results);
+        assertEquals(0, books.size());
     }
 
     @Test
-    public void loanBookShouldWork() {
+    public void findBooksShouldFindBooksByAuthor() {
         // given
-        when(bookExemplarDao.getOne(anyLong())).thenReturn(new PaperBookExemplarEntity(10L, "serial", 130, PaperSize.A_5, BookCover.SOFT));
+        String author = "Popuelin";
+        BookSearchCriteriaTo searchCriteria = new BookSearchCriteriaTo();
+        searchCriteria.setAuthor(author);
         // when
-        BookLoanResultTo bookLoanResultTo = bookService.loanBook(new BookLoanRequestTo());
+        List<BookTo> books = bookService.findBooks(searchCriteria);
         // then
-        assertNotNull(bookLoanResultTo);
-        assertEquals(BookLoanStatus.SUCCESS, bookLoanResultTo.getStatus());
+        assertEquals(4, books.size());
     }
+
+    @Test
+    public void findBooksShouldFindBooksWithSpoiler() {
+        // given
+        BookSearchCriteriaTo searchCriteria = new BookSearchCriteriaTo();
+        searchCriteria.setHasSpoiler(true);
+        // when
+        List<BookTo> books = bookService.findBooks(searchCriteria);
+        // then
+        assertEquals(1, books.size());
+    }
+
+    @Test
+    public void findBooksShouldFindBooksWithoutSpoiler() {
+        // given
+        BookSearchCriteriaTo searchCriteria = new BookSearchCriteriaTo();
+        searchCriteria.setHasSpoiler(false);
+        // when
+        List<BookTo> books = bookService.findBooks(searchCriteria);
+        // then
+        assertEquals(7, books.size());
+    }
+
+    @Test
+    public void findBooksShouldFindBooksAvailable() {
+        // given
+        BookSearchCriteriaTo searchCriteria = new BookSearchCriteriaTo();
+        searchCriteria.setAvailable(true);
+
+        BookLoanRequestTo loadDetails1 = new BookLoanRequestTo();
+        loadDetails1.setBookExemplarId(26);
+        loadDetails1.setCustomerId(1);
+        bookService.loanBook(loadDetails1);
+
+        BookLoanRequestTo loadDetails2 = new BookLoanRequestTo();
+        loadDetails2.setBookExemplarId(14);
+        loadDetails2.setCustomerId(1);
+        bookService.loanBook(loadDetails2);
+
+        // when
+        List<BookTo> books = bookService.findBooks(searchCriteria);
+        // then
+        assertEquals(7, books.size());
+    }
+
+    @Test
+    public void findBooksShouldFindBooksUnavailable() {
+        // given
+        BookSearchCriteriaTo searchCriteria = new BookSearchCriteriaTo();
+        searchCriteria.setAvailable(false);
+
+        BookLoanRequestTo loadDetails = new BookLoanRequestTo();
+        loadDetails.setBookExemplarId(26);
+        loadDetails.setCustomerId(1);
+        bookService.loanBook(loadDetails);
+
+        BookLoanRequestTo loadDetails2 = new BookLoanRequestTo();
+        loadDetails2.setBookExemplarId(14);
+        loadDetails2.setCustomerId(1);
+        bookService.loanBook(loadDetails2);
+
+        // when
+        List<BookTo> books = bookService.findBooks(searchCriteria);
+        // then
+        assertEquals(1, books.size());
+    }
+
+    @Test
+    public void loaningAlreadyLoanedBookShouldNotBePossible() {
+        // given
+        BookLoanRequestTo bookLoanRequestTo = new BookLoanRequestTo();
+        bookLoanRequestTo.setBookExemplarId(26);
+        bookLoanRequestTo.setCustomerId(1);
+        // when first loan try
+        BookLoanResultTo firstBookLoanResultTo = bookService.loanBook(bookLoanRequestTo);
+        // then
+        assertEquals(BookLoanStatus.SUCCESS, firstBookLoanResultTo.getStatus());
+        // when second loan try
+        BookLoanResultTo secondBookLoanResultTo = bookService.loanBook(bookLoanRequestTo);
+        // then
+        assertEquals(BookLoanStatus.ALREADY_BORROWED, secondBookLoanResultTo.getStatus());
+    }
+
+    @Test
+    public void testShouldCreateNewBook() {
+        // given
+        NewBookTo bookToSave = new NewBookTo();
+        bookToSave.setTitle("Title of new book");
+        // when
+        BookTo alreadySavedBook = bookService.createBook(bookToSave);
+        // then
+        assertNotNull(alreadySavedBook.getId());
+        BookTo bookTo = bookService.findBookById(alreadySavedBook.getId());
+        assertNotNull(bookTo);
+        assertTrue(bookTo.getAuthors().isEmpty());
+    }
+
+    @Test
+    public void testShouldCreateNewBookWithAuthor() {
+        // given
+        NewBookTo bookToSave = new NewBookTo();
+        bookToSave.setTitle("Title of new book");
+        bookToSave.setAuthors(new HashSet<>(Arrays.asList(1L)));
+        // when
+        BookTo alreadySavedBook = bookService.createBook(bookToSave);
+        // then
+        assertNotNull(alreadySavedBook.getId());
+        BookTo bookTo = bookService.findBookById(alreadySavedBook.getId());
+        assertNotNull(bookTo);
+        assertEquals(1, bookTo.getAuthors().size());
+    }
+
+    @Test(expected = javax.persistence.EntityNotFoundException.class)
+    public void testShouldCreateNewBookWithAuthor2() {
+        // given
+        final long idOfNonExistentAuthor = 222L;
+        NewBookTo bookToSave = new NewBookTo();
+        bookToSave.setTitle("Title of new book");
+        bookToSave.setAuthors(new HashSet<>(Arrays.asList(idOfNonExistentAuthor)));
+        // when
+        bookService.createBook(bookToSave);
+        // then
+        fail("Should end with EntityNotFoundException");
+    }
+
+    @Test
+    public void testShouldCreateNewBookWithSpoiler() {
+        // given
+        NewBookTo bookToSave = new NewBookTo();
+        bookToSave.setTitle("Title of new book");
+        bookToSave.setSpoiler("Spoiler sample");
+        // when
+        BookTo alreadySavedBook = bookService.createBook(bookToSave);
+        // then
+        assertNotNull(alreadySavedBook.getId());
+        assertEquals(bookToSave.getSpoiler(), bookService.findBookSpoiler(alreadySavedBook.getId()));
+    }
+
+    @Test
+    public void testShouldCreateNewBookWithExemplars() {
+        // given
+        NewBookTo bookToSave = new NewBookTo();
+        bookToSave.setTitle("Title of new book");
+
+        PaperBookExemplarTo paperBookExemplar1 = new PaperBookExemplarTo("123", 333, PaperSize.A_4, BookCover.HARD);
+        PaperBookExemplarTo paperBookExemplar2 = new PaperBookExemplarTo("234", 222, PaperSize.B_5, BookCover.SOFT);
+        AudioBookExemplarTo audioBookExemplar = new AudioBookExemplarTo("321", AudioBookFormat.AUDIO);
+        bookToSave.setExemplars(new HashSet<>(Arrays.asList(paperBookExemplar1, paperBookExemplar2, audioBookExemplar)));
+        // when
+        BookTo alreadySavedBook = bookService.createBook(bookToSave);
+        // then
+        assertNotNull(alreadySavedBook.getId());
+        assertEquals(3, bookService.findBookExemplars(alreadySavedBook.getId()).size());
+    }
+
+    @Test
+    public void updateBookShouldSaveChangesToTheBook() {
+        // given
+        NewBookTo bookToSave = new NewBookTo();
+        bookToSave.setTitle("Title of new book");
+        bookToSave.setSpoiler("Spoiler sample");
+        BookTo createdBook = bookService.createBook(bookToSave);
+
+        String updatedTitle = "Updated title";
+        createdBook.setTitle(updatedTitle);
+        // when
+        BookTo savedBook = bookService.updateBook(createdBook);
+        // then
+        assertEquals(updatedTitle, savedBook.getTitle());
+        assertTrue(savedBook.getVersion() > createdBook.getVersion());
+    }
+
+    @Test(expected = OptimisticLockException.class)
+    public void updateBookShouldThrowOptimisticLockingExceptionWhenUpdatedVersionLowerThanExisting() {
+        // given
+        NewBookTo bookToSave = new NewBookTo();
+        bookToSave.setTitle("Title of new book");
+        bookToSave.setSpoiler("Spoiler sample");
+        BookTo createdBook = bookService.createBook(bookToSave);
+
+        createdBook.setVersion(createdBook.getVersion() - 1);
+        //when
+        bookService.updateBook(createdBook);
+    }
+
 }

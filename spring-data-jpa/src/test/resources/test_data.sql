@@ -106,3 +106,10 @@ insert into customer(id, email, birth_date, first_name, last_name, phone_number)
 -- customer card
 insert into customer_card(id, serial_number, expiration_date, customer_fk) values (1, 'card1', TO_DATE('2016/03/30', 'YYYY/MM/DD'), 1);
 insert into customer_card(id, serial_number, expiration_date, customer_fk) values (2, 'card2', TO_DATE('2014/04/15', 'YYYY/MM/DD'), 1);
+insert into customer_card(id, serial_number, expiration_date, customer_fk) values (3, 'card3', TO_DATE('2012/02/11', 'YYYY/MM/DD'), null);
+
+-- loan
+
+insert into loan(id, loan_date, customer_fk) values (1, TO_TIMESTAMP ( '23/11/2014 14:30:40', 'DD/MM/YYYY HH:MI:SS'), 1);
+update book_exemplar set loan_fk = 1 where id = 1;
+update book_exemplar set loan_fk = 1 where id = 3;

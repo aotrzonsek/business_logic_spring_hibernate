@@ -24,7 +24,7 @@ public class CustomerEntity {
     @Column(length = 35, nullable = false)
     private String email;
 
-    @OneToMany(mappedBy = "customerEntity")
+    @OneToMany(mappedBy = "customerEntity", cascade = CascadeType.REMOVE)
     private Set<LoanEntity> loans = new HashSet<>();
 
     // strange behavior, orphanRemoval must be used together with cascade, otherwise it does not work

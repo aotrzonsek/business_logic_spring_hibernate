@@ -26,4 +26,9 @@ public class CustomerRestService {
     public List<CustomerTo> getCustomers() {
         return customerService.findAllCustomers();
     }
+
+    @RequestMapping(value = "/customer/{customerId}", method = RequestMethod.DELETE)
+    public void deleteCustomer(@PathVariable long customerId) {
+        customerService.deleteCustomer(customerId);
+    }
 }

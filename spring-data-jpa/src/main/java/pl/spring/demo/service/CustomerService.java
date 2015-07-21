@@ -9,4 +9,6 @@ public interface CustomerService {
     CustomerTo createCustomer(CustomerTo customer);
 
     List<CustomerTo> findAllCustomers();
+
+    void deleteCustomer(long customerId);
 }

@@ -17,9 +17,12 @@ public class CustomerMapper extends AbstractMapper<CustomerEntity, CustomerTo> {
 
     private final BookExemplarMapper bookExemplarMapper;
 
+    private final CustomerCardMapper customerCardMapper;
+
     @Autowired
-    public CustomerMapper(BookExemplarMapper bookExemplarMapper) {
+    public CustomerMapper(BookExemplarMapper bookExemplarMapper, CustomerCardMapper customerCardMapper) {
         this.bookExemplarMapper = bookExemplarMapper;
+        this.customerCardMapper = customerCardMapper;
     }
 
     @Override
@@ -30,6 +33,7 @@ public class CustomerMapper extends AbstractMapper<CustomerEntity, CustomerTo> {
         customerTo.setPersonalData(source.getPersonalData());
         customerTo.setPhone(source.getPhoneNumber());
         customerTo.setLoanedBookExemplars(determineLoanedBookExemplars(source));
+        customerTo.setCustomerCards(new ArrayList<>(customerCardMapper.mapSourceCollection(source.getCards())));
         return customerTo;
     }
 

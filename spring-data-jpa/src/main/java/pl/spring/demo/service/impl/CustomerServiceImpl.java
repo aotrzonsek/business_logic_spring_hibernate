@@ -38,4 +38,11 @@ public class CustomerServiceImpl implements CustomerService {
         List<CustomerEntity> customerEntities = customerDao.findAll();
         return new ArrayList<>(customerMapper.mapSourceCollection(customerEntities));
     }
+
+    @Override
+    public void deleteCustomer(long customerId) {
+        CustomerEntity customerEntity = customerDao.find(customerId);
+        customerEntity.getLoans().forEach(loan -> loan.getBookExemplars().forEach(bookExemplar -> bookExemplar.setLoan(null)));
+        customerDao.delete(customerEntity);
+    }
 }
