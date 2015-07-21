@@ -1,7 +1,6 @@
 package pl.spring.demo.cache.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import pl.spring.demo.cache.BookCache;
 import pl.spring.demo.service.BookService;
@@ -20,7 +19,7 @@ public class BookCacheImpl implements BookCache {
         this.bookService = bookService;
     }
 
-    @Cacheable(value = "books", keyGenerator = "cacheKeyProvider")
+    // TODO Use cache mechanism from Spring
     @Override
     public List<BookTo> findBooks(BookSearchCriteriaTo searchCriteria) {
         return bookService.findBooks(searchCriteria);
