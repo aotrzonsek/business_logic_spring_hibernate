@@ -5,7 +5,6 @@ import com.mysema.query.jpa.HQLTemplates;
 import com.mysema.query.jpa.JPASubQuery;
 import com.mysema.query.jpa.impl.JPAQuery;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 import pl.spring.demo.dao.BookDao;
 import pl.spring.demo.entity.*;
 import pl.spring.demo.to.BookSearchCriteriaTo;
@@ -23,16 +22,6 @@ public class BookDaoImpl extends AbstractDao<BookEntity, Long> implements BookDa
         if (bookSearchCriteria != null) {
             final BooleanBuilder predicate = new BooleanBuilder();
 
-            if (!StringUtils.isEmpty(bookSearchCriteria.getTitle())) {
-                final String title = bookSearchCriteria.getTitle();
-                predicate.and(bookEntity.title.startsWithIgnoreCase(title));
-            }
-            if (!StringUtils.isEmpty(bookSearchCriteria.getAuthor())) {
-                final String author = bookSearchCriteria.getAuthor();
-                predicate.and(bookEntity.authors.any().personalData.firstName.startsWithIgnoreCase(author)
-                        .or(bookEntity.authors.any().personalData.lastName.startsWithIgnoreCase(author)))
-                        .or(bookEntity.authors.any().nickName.startsWithIgnoreCase(author));
-            }
             if (Boolean.TRUE.equals(bookSearchCriteria.getHasSpoiler())) {
                 predicate.and(bookEntity.bookSpoiler.id.isNotNull());
             }
