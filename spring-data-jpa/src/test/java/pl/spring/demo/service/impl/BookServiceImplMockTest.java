@@ -10,7 +10,6 @@ import pl.spring.demo.dao.BookExemplarDao;
 import pl.spring.demo.dao.CustomerDao;
 import pl.spring.demo.dao.LoanDao;
 import pl.spring.demo.entity.BookEntity;
-import pl.spring.demo.entity.LoanEntity;
 import pl.spring.demo.entity.PaperBookExemplarEntity;
 import pl.spring.demo.mapper.BookMapper;
 import pl.spring.demo.service.helper.CurrentDateProvider;
@@ -23,7 +22,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.when;
