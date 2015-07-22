@@ -19,7 +19,7 @@ public class BookCacheImpl implements BookCache {
         this.bookService = bookService;
     }
 
-    // TODO Use cache mechanism from Spring
+    // TODO Use Spring cache
     @Override
     public List<BookTo> findBooks(BookSearchCriteriaTo searchCriteria) {
         return bookService.findBooks(searchCriteria);
