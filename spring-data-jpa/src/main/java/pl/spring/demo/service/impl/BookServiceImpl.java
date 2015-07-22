@@ -105,4 +105,10 @@ public class BookServiceImpl implements BookService {
     public List<BookExemplarTo> findBookExemplars(long bookId) {
         return new ArrayList<>(bookExemplarMapper.mapSourceCollection(bookExemplarDao.findAllBookExemplars(bookId)));
     }
+
+    @Override
+    @Transactional(readOnly = false)
+    public void removeBookById(long bookIdToRemove) {
+        bookDao.delete(bookIdToRemove);
+    }
 }

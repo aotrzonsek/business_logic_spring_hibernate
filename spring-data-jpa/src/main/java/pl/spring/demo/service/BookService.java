@@ -19,4 +19,6 @@ public interface BookService {
     String findBookSpoiler(long bookId);
 
     List<BookExemplarTo> findBookExemplars(long bookId);
+
+    void removeBookById(long bookIdToRemove);
 }
