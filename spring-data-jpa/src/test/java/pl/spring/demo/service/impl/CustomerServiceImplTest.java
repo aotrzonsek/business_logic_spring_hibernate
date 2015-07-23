@@ -28,6 +28,18 @@ public class CustomerServiceImplTest extends AbstractDatabaseTest {
     @Autowired
     private BookExemplarDao bookExemplarDao;
 
+    @Ignore
+    @Test
+    public void testShouldDeleteCustomer() {
+        // given
+        long customerId = 2L;
+        long existingCustomersSize = customerService.findAllCustomers().size();
+        // when
+        customerService.deleteCustomer(customerId);
+        // then
+        assertEquals(existingCustomersSize - 1, customerService.findAllCustomers().size());
+    }
+
     // TODO Implement CustomerServiceImpl.deleteCustomer()
     @Ignore
     @Test
@@ -35,10 +47,11 @@ public class CustomerServiceImplTest extends AbstractDatabaseTest {
         // given
         long customerId = 1L;
         long countOfBookExemplarsBeforeDelete = bookExemplarDao.count();
+        long existingCustomersSize = customerService.findAllCustomers().size();
         // when
         customerService.deleteCustomer(customerId);
         // then
-        assertEquals(0, customerService.findAllCustomers().size());
+        assertEquals(existingCustomersSize - 1, customerService.findAllCustomers().size());
 
         List<CustomerCardTo> allCustomerCards = customerCardService.getAllCustomerCards();
         assertEquals(1, allCustomerCards.size());

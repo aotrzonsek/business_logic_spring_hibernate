@@ -102,6 +102,7 @@ insert into book_author (author_id, book_id) values (2, 8);
 
 -- customer
 insert into customer(id, email, birth_date, first_name, last_name, phone_number) values (1, 'customer.gmail.pl', TO_DATE('1992/01/15', 'YYYY/MM/DD'), 'Jan', 'Kliendzki', '111-222-333');
+insert into customer(id, email, birth_date, first_name, last_name, phone_number) values (2, 'customer2.gmail.pl', TO_DATE('1999/06/19', 'YYYY/MM/DD'), 'Janusz', 'Deweloperki', '324-556-499');
 
 -- customer card
 insert into customer_card(id, serial_number, expiration_date, customer_fk) values (1, 'card1', TO_DATE('2016/03/30', 'YYYY/MM/DD'), 1);

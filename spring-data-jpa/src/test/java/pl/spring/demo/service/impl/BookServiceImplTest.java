@@ -253,17 +253,4 @@ public class BookServiceImplTest extends AbstractDatabaseTest {
         assertEquals(updatedTitle, savedBook.getTitle());
         assertTrue(savedBook.getVersion() > createdBook.getVersion());
     }
-
-    @Test(expected = OptimisticLockException.class)
-    public void updateBookShouldThrowOptimisticLockingExceptionWhenUpdatedVersionLowerThanExisting() {
-        // given
-        NewBookTo bookToSave = new NewBookTo();
-        bookToSave.setTitle("Title of new book");
-        bookToSave.setSpoiler("Spoiler sample");
-        BookTo createdBook = bookService.createBook(bookToSave);
-
-        createdBook.setVersion(createdBook.getVersion() - 1);
-        //when
-        bookService.updateBook(createdBook);
-    }
 }
