@@ -1,4 +1,3 @@
-
 create table audio_book (
     format varchar(255) not null,
     book_ex_id bigint not null,
@@ -14,6 +13,7 @@ create table author (
     last_name varchar(255) not null,
     version bigint not null,
     literary_genre varchar(255),
+    university varchar(255),
     primary key (id)
 );
 

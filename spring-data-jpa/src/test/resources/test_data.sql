@@ -114,3 +114,6 @@ insert into customer_card(id, serial_number, expiration_date, customer_fk) value
 insert into loan(id, loan_date, customer_fk) values (1, TO_TIMESTAMP ( '23/11/2014 14:30:40', 'DD/MM/YYYY HH:MI:SS'), 1);
 update book_exemplar set loan_fk = 1 where id = 1;
 update book_exemplar set loan_fk = 1 where id = 3;
+
+-- professor author
+insert into author (id, type, birth_date, first_name, last_name, university, version) values (13, 'PROFES',TO_DATE('1949/02/11', 'YYYY/MM/DD'), 'Janusz', 'Ratajczak', 'PWR', 0);
